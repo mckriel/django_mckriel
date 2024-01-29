@@ -38,3 +38,9 @@ class Lineup(models.Model):
 
     def __str__(self):
         return self.artist_name
+
+    def formatted_start_time(self):
+        return self.start_time.strftime('%H:%M')
+
+    def formatted_end_time(self):
+        return self.end_time.strftime('%H:%M')
