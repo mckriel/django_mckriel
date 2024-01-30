@@ -122,3 +122,5 @@ function displayLineupItems(lineupItems) {
     displayLineup = displayLineup.join("");
     scheduleList.innerHTML = displayLineup;
 }
+
+// this makes no sense
