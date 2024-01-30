@@ -1,1 +1,1 @@
-web: gunicorn habitat_project.wsgi --log-file -
+web: gunicorn django_mckriel.wsgi --log-file -
