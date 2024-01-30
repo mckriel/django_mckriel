@@ -14,7 +14,7 @@ const dbPromise = idb.open('lineup-db', 1, function (upgradeDb) {
 
 
 function pullRemoteLineupInformation() {
-    fetch('http://127.0.0.1:8000/habitat/get_lineup_info/1/').then(function (response) {
+    fetch('/habitat/get_lineup_info/1/').then(function (response) {
         return response.json();
     }).then(function (jsondata) {
         console.log(`Response from remote server:`)
