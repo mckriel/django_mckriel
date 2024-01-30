@@ -12,21 +12,9 @@ const dbPromise = idb.open('lineup-db', 1, function (upgradeDb) {
     upgradeDb.createObjectStore('lineup', {keyPath: 'pk'});
 });
 
-// New function to handle both click and touch events
-function handleClickOrTouch() {
-    pullRemoteLineupInformation();
-    retrieveLineupFromIndexDB().then(function () {
-        let startDay = lineup2.filter(function (lineupItem) {
-            return String(lineupItem.fields.day_of_week) === "5"; // Filter for Saturday
-        });
-
-        displayLineupItems(startDay);
-    });
-}
-
 
 function pullRemoteLineupInformation() {
-    fetch('/habitat/get_lineup_info/1/').then(function (response) {
+    fetch('http://127.0.0.1:8000/habitat/get_lineup_info/1/').then(function (response) {
         return response.json();
     }).then(function (jsondata) {
         console.log(`Response from remote server:`)
