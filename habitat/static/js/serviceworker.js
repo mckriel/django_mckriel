@@ -6,6 +6,7 @@ const CURRENT_CACHE = `cache-storage-V${CACHE_VERSION}`;
 const cacheFiles = [
     // pages
     '/habitat',
+    '/habitat/directions/',
     // files
     '/static/style.css',
     '/static/patua-one-v20-latin-regular.woff2',

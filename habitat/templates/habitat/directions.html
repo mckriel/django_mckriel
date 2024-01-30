@@ -1,17 +1,40 @@
-{% extends 'habitat_pwa/base.html' %}
+{% extends 'habitat/base.html' %}
 {% block content %}
 {% load static %}
 
 <div class="directions-body">
     <div class="directions-text">
-        <p class="header-text">DIRECTIONS</p>
-        <p>From Ceres, follow the R46 East in the direction of Touws River. 11km past Ceres turn right onto the Bo-Swaarmoed road. Follow this road for 19km (up the pass and past the Klondyke Cherry Farm)</p>
-        <p>Don't turn right until you see a sign that says Matroosberg, 2km. Follow the dirt road to the gate straight ahead. Please drive slow on the dirt road and in the reserve</p>
-        <p>Driving time and distance: From Cape Town - 2 hours, 164km (via Bainskloof)</p>
+        <p class="header-text">
+            Directions to <br>
+            Cloof Wine Estate
+        </p>
+        <p class="directions-body-text">
+            Start in the direction of the N1 highway northbound.
+            Follow the signs leading to Paarl.
+        </p>
+        <p class="directions-body-text">
+            From the N1 merge onto the N7 highway towards Malmesbury.
+            Continue driving on N7 for approximately 50 kilometers until you get to Malmesbury.
+        </p>
+        <p class="directions-body-text">
+            Turn left on the R315 towards Darling.
+            Continue driving until you get to the train tracks, then turn left towards Darling Cellars.
+        </p>
+        <p class="directions-body-text">
+            Carry on straight on the dirt road for about 5km until you get to Cloof Wine Estate, on your right hand side.
+        </p>
+        <p class="directions-body-text-warning">
+            VERY IMPORTANT <br>
+            Do not turn left toward Chatsworth or Kalkbaskraal as Google Maps suggests. <br>
+        </p>
+
+
     </div>
     <div class="directions-pin">
-        <br>
-        <div><a href="https://maps.app.goo.gl/C72ZcTeRtXzmRweS8" target=”_blank”>Follow this pin<span class="material-symbols-outlined">location_on</span></a> </div>
+        <div><a href="https://maps.app.goo.gl/C72ZcTeRtXzmRweS8" target=”_blank”>Malmesbury<span class="material-symbols-outlined">location_on</span></a> </div>
     </div>
+    <p class="directions-body-text">
+            Use this pin to get to Malmesbury and <br> follow the remaining instructions
+    </p>
 </div>
 {% endblock %}

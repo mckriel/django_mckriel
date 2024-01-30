@@ -9,6 +9,9 @@ def index(request):
     template = 'habitat/index.html'
     return render(request, template)
 
+def directions(request):
+    template = 'habitat/directions.html'
+    return render(request, template)
 
 # Get the lineup data, with an optional filter by event_id
 def get_lineup_info(request, event_id=None):

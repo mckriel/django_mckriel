@@ -114,7 +114,7 @@ li {
 .header-text {
     font-size: 22px;
     font-family: "Patua One";
-    color: var(--white);
+    color: var(--schedulecardtitle);
 }
 
 .schedule-card-body {
@@ -234,12 +234,12 @@ li {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: var(--border1);
+
     border-radius: 5px;
     height: 40px;
     width: 250px;
     text-transform: uppercase;
-    background-color: var(--white);
+    background-color: var(--schedulecardtime);
     margin-top: 20px;
 }
 
@@ -249,4 +249,12 @@ li {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.directions-body-text {
+    color: var(--schedulecardtime);
+}
+
+.directions-body-text-warning {
+    color: #9f555c;
 }

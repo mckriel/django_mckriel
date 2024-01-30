@@ -1,10 +1,12 @@
 let lineup2 = [];
 
+
 const scheduleList = document.querySelector('.schedule-list');
 const filterButton = document.querySelectorAll('.filter-button');
 const filterButtons = document.querySelectorAll('.day-selector *');
 const navFilterButton = document.querySelectorAll('.nav-item');
 const navFilterButtons = document.querySelectorAll('.navbar *');
+
 
 const dbPromise = idb.open('lineup-db', 1, function (upgradeDb) {
     upgradeDb.createObjectStore('lineup', {keyPath: 'pk'});
@@ -28,6 +30,7 @@ function pullRemoteLineupInformation() {
         });
     });
 }
+
 
 function retrieveLineupFromIndexDB() {
     return new Promise(function (resolve, reject) {
@@ -73,50 +76,6 @@ function retrieveLineupFromIndexDB() {
 }
 
 
-
-
-//function retrieveLineupFromIndexDB() {
-//    const dbName = 'lineup-db';
-//    const objectStoreName = 'lineup';
-//    const request = indexedDB.open(dbName);
-//
-//    request.onerror = function (event) {
-//        console.error('Failed to open the database:', event.target.errorCode);
-//    };
-//
-//    request.onsuccess = function (event) {
-//        const db = event.target.result;
-//
-//        const transaction = db.transaction([objectStoreName], 'readonly');
-//        const objectStore = transaction.objectStore(objectStoreName);
-//
-//        const request = objectStore.openCursor();
-//
-//        const jsonData = [];
-//
-//        request.onsuccess = (event) => {
-//            const cursor = event.target.result;
-//
-//            if (cursor) {
-//                // Check if the entry has a valid value before adding it to the array
-//                if (cursor.value) {
-//                    jsonData.push(cursor.value);
-//                }
-//                cursor.continue();
-//            } else {
-//                // All entries have been processed
-//                console.log('Exported JSON:', jsonData);
-//                lineup2 = jsonData;
-//            }
-//        };
-//
-//        request.onerror = (event) => {
-//            console.error('Error exporting JSON:', event.target.error);
-//        };
-//    }
-//}
-
-//
 window.addEventListener('DOMContentLoaded', function () {
     pullRemoteLineupInformation();
     retrieveLineupFromIndexDB().then(function () {
@@ -128,7 +87,7 @@ window.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-//
+
 filterButton.forEach(function (btn) {
     btn.addEventListener('click', function (e) {
         removeActiveFromDaySelector();
@@ -163,5 +122,3 @@ function displayLineupItems(lineupItems) {
     displayLineup = displayLineup.join("");
     scheduleList.innerHTML = displayLineup;
 }
-
-
