@@ -26,79 +26,64 @@ function handleClickOrTouch() {
 
 
 function pullRemoteLineupInformation() {
-    fetch('/habitat/get_lineup_info/1/').then(function (response) {
+    return fetch('/habitat/get_lineup_info/1/').then(function (response) {
         return response.json();
     }).then(function (jsondata) {
         console.log(`Response from remote server:`)
-        console.log(jsondata)
-        dbPromise.then(function(db){
+        console.log(jsondata);
+
+        return dbPromise.then(function(db){
             var tx = db.transaction('lineup', 'readwrite');
             var lineupStore = tx.objectStore('lineup');
-            for(var key in jsondata) {
+            var putPromises = [];
+
+            for (var key in jsondata) {
                 if (jsondata.hasOwnProperty(key)) {
-                    lineupStore.put(jsondata[key]);
+                    putPromises.push(lineupStore.put(jsondata[key]));
                 }
             }
+
+            // Return a promise that resolves when all put operations are complete
+            return Promise.all(putPromises);
         });
     });
 }
 
 
 function retrieveLineupFromIndexDB() {
-    return new Promise(function (resolve, reject) {
-        const dbName = 'lineup-db';
-        const objectStoreName = 'lineup';
-        const request = indexedDB.open(dbName);
+    return dbPromise.then(function (db) {
+        const objectStore = db.transaction('lineup').objectStore('lineup');
+        const request = objectStore.getAll();
 
-        request.onerror = function (event) {
-            console.error('Failed to open the database:', event.target.errorCode);
-            reject();
-        };
-
-        request.onsuccess = function (event) {
-            const db = event.target.result;
-            const transaction = db.transaction([objectStoreName], 'readonly');
-            const objectStore = transaction.objectStore(objectStoreName);
-            const request = objectStore.openCursor();
-            const jsonData = [];
-
+        return new Promise(function (resolve, reject) {
             request.onsuccess = function (event) {
-                const cursor = event.target.result;
-
-                if (cursor) {
-                    // Check if the entry has a valid value before adding it to the array
-                    if (cursor.value) {
-                        jsonData.push(cursor.value);
-                    }
-                    cursor.continue();
-                } else {
-                    // All entries have been processed
-                    console.log('Exported JSON:', jsonData);
-                    lineup2 = jsonData;
-                    resolve();
-                }
+                resolve(event.target.result);
             };
 
             request.onerror = function (event) {
                 console.error('Error exporting JSON:', event.target.error);
                 reject();
             };
-        };
+        });
     });
 }
 
 
-// Call handleClickOrTouch on DOMContentLoaded with the first button
 window.addEventListener('DOMContentLoaded', function () {
-    filterButtons.forEach(function (button) {
-        button.addEventListener('click', handleClickOrTouch);
-        button.addEventListener('touchstart', handleClickOrTouch);
-    });
+    pullRemoteLineupInformation().then(function () {
+        return retrieveLineupFromIndexDB();
+    }).then(function (lineupData) {
+        // Now you have the populated lineupData array
+        console.log('Exported JSON:', lineupData);
 
-    // Trigger the click event on the first button to initialize the content
-    if (filterButtons.length > 0) {
-        filterButtons[0].click();
-    }
+        let startDay = lineupData.filter(function (lineupItem) {
+            return String(lineupItem.fields.day_of_week) === "5"; // Filter for Saturday
+        });
+
+        displayLineupItems(startDay);
+    }).catch(function (error) {
+        console.error('Error:', error);
+    });
 });
 
 // Modified function to handle both click and touch events
