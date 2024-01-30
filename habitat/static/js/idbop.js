@@ -1,17 +1,44 @@
 let lineup2 = [];
 
-
 const scheduleList = document.querySelector('.schedule-list');
 const filterButton = document.querySelectorAll('.filter-button');
 const filterButtons = document.querySelectorAll('.day-selector *');
 const navFilterButton = document.querySelectorAll('.nav-item');
 const navFilterButtons = document.querySelectorAll('.navbar *');
 
-
 const dbPromise = idb.open('lineup-db', 1, function (upgradeDb) {
-    upgradeDb.createObjectStore('lineup', {keyPath: 'pk'});
+    upgradeDb.createObjectStore('lineup', { keyPath: 'pk' });
 });
 
+// New function to handle both click and touch events
+function handleClickOrTouch(e) {
+    pullRemoteLineupInformation();
+    retrieveLineupFromIndexDB().then(function () {
+        removeActiveFromDaySelector(); // Remove active class from all buttons
+        const dayId = e.currentTarget.dataset.id;
+        e.currentTarget.classList.add('day-select-active'); // Add active class to clicked button
+
+        let lineupDay = lineup2;
+        if (dayId) {
+            lineupDay = lineup2.filter(function (lineupItem) {
+                return String(lineupItem.fields.day_of_week) === dayId;
+            });
+        }
+
+        displayLineupItems(lineupDay);
+    });
+}
+
+// Call handleClickOrTouch on DOMContentLoaded
+window.addEventListener('DOMContentLoaded', function () {
+    handleClickOrTouch({ currentTarget: filterButton[0] }); // Initial call with the first button
+});
+
+// Add event listeners for both click and touch events
+filterButton.forEach(function (btn) {
+    btn.addEventListener('click', handleClickOrTouch);
+    btn.addEventListener('touchstart', handleClickOrTouch);
+});
 
 function pullRemoteLineupInformation() {
     fetch('/habitat/get_lineup_info/1/').then(function (response) {
@@ -19,10 +46,10 @@ function pullRemoteLineupInformation() {
     }).then(function (jsondata) {
         console.log(`Response from remote server:`)
         console.log(jsondata)
-        dbPromise.then(function(db){
+        dbPromise.then(function (db) {
             var tx = db.transaction('lineup', 'readwrite');
             var lineupStore = tx.objectStore('lineup');
-            for(var key in jsondata) {
+            for (var key in jsondata) {
                 if (jsondata.hasOwnProperty(key)) {
                     lineupStore.put(jsondata[key]);
                 }
@@ -30,7 +57,6 @@ function pullRemoteLineupInformation() {
         });
     });
 }
-
 
 function retrieveLineupFromIndexDB() {
     return new Promise(function (resolve, reject) {
@@ -75,41 +101,11 @@ function retrieveLineupFromIndexDB() {
     });
 }
 
-
-window.addEventListener('DOMContentLoaded', function () {
-    pullRemoteLineupInformation();
-    retrieveLineupFromIndexDB().then(function () {
-        let startDay = lineup2.filter(function (lineupItem) {
-            return String(lineupItem.fields.day_of_week) === "5"; // Filter for Saturday
-        });
-
-        displayLineupItems(startDay);
-    });
-});
-
-
-filterButton.forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-        removeActiveFromDaySelector();
-        btn.classList.add('day-select-active');
-        const dayId = e.currentTarget.dataset.id;
-        const lineupDay = lineup2.filter(function (lineupItem) {
-            if (String(lineupItem.fields.day_of_week) === dayId) {
-                return lineupItem;
-            }
-        });
-        console.log(lineupDay);
-        displayLineupItems(lineupDay);
-    });
-});
-
-
 function removeActiveFromDaySelector() {
     filterButtons.forEach((element) => {
         element.classList.remove('day-select-active');
     })
 }
-
 
 function displayLineupItems(lineupItems) {
     let displayLineup = lineupItems.map(function (item) {
