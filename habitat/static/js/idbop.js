@@ -26,91 +26,78 @@ function handleClickOrTouch() {
 
 
 function pullRemoteLineupInformation() {
-    return fetch('/habitat/get_lineup_info/1/').then(function (response) {
+    fetch('/habitat/get_lineup_info/1/').then(function (response) {
         return response.json();
     }).then(function (jsondata) {
         console.log(`Response from remote server:`)
-        console.log(jsondata);
-
-        return dbPromise.then(function(db){
+        console.log(jsondata)
+        dbPromise.then(function(db){
             var tx = db.transaction('lineup', 'readwrite');
             var lineupStore = tx.objectStore('lineup');
-            var putPromises = [];
-
-            for (var key in jsondata) {
+            for(var key in jsondata) {
                 if (jsondata.hasOwnProperty(key)) {
-                    putPromises.push(lineupStore.put(jsondata[key]));
+                    lineupStore.put(jsondata[key]);
                 }
             }
-
-            // Return a promise that resolves when all put operations are complete
-            return Promise.all(putPromises);
         });
     });
 }
 
 
 function retrieveLineupFromIndexDB() {
-    return dbPromise.then(function (db) {
-        const objectStore = db.transaction('lineup').objectStore('lineup');
-        const request = objectStore.getAll();
+    return new Promise(function (resolve, reject) {
+        const dbName = 'lineup-db';
+        const objectStoreName = 'lineup';
+        const request = indexedDB.open(dbName);
 
-        return new Promise(function (resolve, reject) {
+        request.onerror = function (event) {
+            console.error('Failed to open the database:', event.target.errorCode);
+            reject();
+        };
+
+        request.onsuccess = function (event) {
+            const db = event.target.result;
+            const transaction = db.transaction([objectStoreName], 'readonly');
+            const objectStore = transaction.objectStore(objectStoreName);
+            const request = objectStore.openCursor();
+            const jsonData = [];
+
             request.onsuccess = function (event) {
-                resolve(event.target.result);
+                const cursor = event.target.result;
+
+                if (cursor) {
+                    // Check if the entry has a valid value before adding it to the array
+                    if (cursor.value) {
+                        jsonData.push(cursor.value);
+                    }
+                    cursor.continue();
+                } else {
+                    // All entries have been processed
+                    console.log('Exported JSON:', jsonData);
+                    lineup2 = jsonData;
+                    resolve();
+                }
             };
 
             request.onerror = function (event) {
                 console.error('Error exporting JSON:', event.target.error);
                 reject();
             };
-        });
+        };
     });
 }
 
 
 window.addEventListener('DOMContentLoaded', function () {
-    pullRemoteLineupInformation().then(function () {
-        return retrieveLineupFromIndexDB();
-    }).then(function (lineupData) {
-        // Now you have the populated lineupData array
-        console.log('Exported JSON:', lineupData);
-
-        let startDay = lineupData.filter(function (lineupItem) {
+    pullRemoteLineupInformation();
+    retrieveLineupFromIndexDB().then(function () {
+        let startDay = lineup2.filter(function (lineupItem) {
             return String(lineupItem.fields.day_of_week) === "5"; // Filter for Saturday
         });
 
         displayLineupItems(startDay);
-    }).catch(function (error) {
-        console.error('Error:', error);
     });
 });
-
-// Modified function to handle both click and touch events
-function handleClickOrTouch(event) {
-    event.preventDefault();  // Prevent default action for touch events
-    const button = event.currentTarget;
-
-    pullRemoteLineupInformation();
-    retrieveLineupFromIndexDB().then(function () {
-        removeActiveFromDaySelector();
-
-        // Ensure that button.dataset exists and has an 'id' property
-        const dayId = button.dataset && button.dataset.id;
-        if (!dayId) {
-            console.error("Data id not found on clicked/touched element.");
-            return;
-        }
-
-        button.classList.add('day-select-active');
-
-        let lineupDay = lineup2.filter(function (lineupItem) {
-            return String(lineupItem.fields.day_of_week) === dayId;
-        });
-
-        displayLineupItems(lineupDay);
-    });
-}
 
 
 filterButton.forEach(function (btn) {
