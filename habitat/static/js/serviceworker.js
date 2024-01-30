@@ -1,5 +1,5 @@
 // Cache version control
-const CACHE_VERSION = 7;
+const CACHE_VERSION = 8;
 const CURRENT_CACHE = `cache-storage-V${CACHE_VERSION}`;
 
 // List of routes that are going to be cached
