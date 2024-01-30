@@ -174,7 +174,7 @@ li {
     color: var(--daypickerinactive);
     text-transform: uppercase;
     background-color: var(--backgroundlight);
-    width: 100px
+    width: 110px
 }
 
 .filter-button:hover {
