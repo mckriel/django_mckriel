@@ -88,44 +88,16 @@ function retrieveLineupFromIndexDB() {
 }
 
 
-// Call handleClickOrTouch on DOMContentLoaded with the first button
 window.addEventListener('DOMContentLoaded', function () {
-    filterButtons.forEach(function (button) {
-        button.addEventListener('click', handleClickOrTouch);
-        button.addEventListener('touchstart', handleClickOrTouch);
-    });
-
-    // Trigger the click event on the first button to initialize the content
-    if (filterButtons.length > 0) {
-        filterButtons[0].click();
-    }
-});
-
-// Modified function to handle both click and touch events
-function handleClickOrTouch(event) {
-    event.preventDefault();  // Prevent default action for touch events
-    const button = event.currentTarget;
-
     pullRemoteLineupInformation();
     retrieveLineupFromIndexDB().then(function () {
-        removeActiveFromDaySelector();
-
-        // Ensure that button.dataset exists and has an 'id' property
-        const dayId = button.dataset && button.dataset.id;
-        if (!dayId) {
-            console.error("Data id not found on clicked/touched element.");
-            return;
-        }
-
-        button.classList.add('day-select-active');
-
-        let lineupDay = lineup2.filter(function (lineupItem) {
-            return String(lineupItem.fields.day_of_week) === dayId;
+        let startDay = lineup2.filter(function (lineupItem) {
+            return String(lineupItem.fields.day_of_week) === "5"; // Filter for Saturday
         });
 
-        displayLineupItems(lineupDay);
+        displayLineupItems(startDay);
     });
-}
+});
 
 
 filterButton.forEach(function (btn) {
